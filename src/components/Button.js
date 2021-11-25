@@ -5,10 +5,34 @@ export default function Button(){
 
     const [status, setStatus] = useState("Notifications are off")
     const [subscribed, setSubscribed] = useState(false)
+    const [compatibleBrowser, setCompatibleBrowser] = useState(false);
     const CleverPush = window.CleverPush || [];
     CleverPush.push(['unsubscribe']);
   
     
+    useEffect(() => {
+        console.log("useeffect")
+        document.getElementById('#cleverpush-button').style.display = 'none';
+    
+        var showPushOptIn = function() {
+            document.getElementById('#cleverpush-button').style.display = 'block';
+        }
+        
+        if (!window.CleverPush || !window.CleverPush.initialized) {
+            window.cleverPushInitCallback = function(err) {
+                if (err) {
+                    console.error('Init callback error:', err);
+                } else {
+                    showPushOptIn();
+                    setCompatibleBrowser(true)
+                }
+            };
+        } else {
+            showPushOptIn();
+            setCompatibleBrowser(true)
+        }
+      });
+
 
     const handleClick = event => {
 
@@ -38,11 +62,26 @@ export default function Button(){
         
     }
 
-    return(
-        <BigButton onClick = {handleClick}>
-            {status}
-        </BigButton>
-    )
+    if (compatibleBrowser) {
+        return(
+            <BigButton onClick = {handleClick} id = "#cleverpush-button">
+                {status}
+            </BigButton>
+        )
+    }
+    else {
+        return (
+            <div>
+                <p id = "#cleverpush-button"></p>
+
+                <p>
+                Your browser is not compatible with push notifications
+            </p>
+            </div>
+            
+        )
+    }
+    
 }
 
 
