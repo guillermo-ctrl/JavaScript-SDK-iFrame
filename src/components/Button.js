@@ -3,23 +3,52 @@ import {useEffect, useState} from "react";
 
 export default function Button(){
 
-    const [status, setStatus] = useState("Notifications are off")
+    const [buttonText, setButtonText] = useState("Notifications are off")
     const [subscribed, setSubscribed] = useState(false)
     const CleverPush = window.CleverPush || [];
     CleverPush.push(['unsubscribe']);
   
     
+    useEffect(() => {
+        const button = document.getElementById('#cleverpush-button')
+        const text = document.getElementById('#non-compatible-message')
+        
+        button.style.display = 'none';
+        text.style.display = 'none';
+
+        var showPushOptIn = function() {
+            button.style.display = 'block';
+            text.style.display = 'none';
+        }
+
+        var hidePushOptin = function() {
+            button.style.display = 'none';
+            text.style.display = 'block';
+        }
+        
+        if (!window.CleverPush || !window.CleverPush.initialized) {
+            window.cleverPushInitCallback = function(err) {
+                if (err) {
+                    console.error('Init callback error:', err);
+                    hidePushOptin();
+                } else {
+                    showPushOptIn();
+                }
+            };
+        } else {
+            showPushOptIn();
+        }
+      });
+
 
     const handleClick = event => {
-
         CleverPush.push(['isSubscribed', function(result) {
-            console.log('CleverPush isSubscribed result', result); 
             setSubscribed(result)
           }])
 
         if (subscribed) {
             CleverPush.push(['unsubscribe']);
-            setStatus("Notifications are off")
+            setButtonText("Notifications are off")
             setSubscribed(false)
         }
         else {
@@ -28,30 +57,28 @@ export default function Button(){
                     console.error(err);
                     alert("There was an error, please try again");
                 } else {
-                    console.log('successfully subscribed with id', subscriptionId);
                     setSubscribed(true)
-                    setStatus("Notifications are on")
+                    setButtonText("Notifications are on")
                 }
             }]);
-            
         }
-        
     }
 
     return(
-        <BigButton onClick = {handleClick}>
-            {status}
-        </BigButton>
+        <div>
+            <OptinButton onClick = {handleClick} id = "#cleverpush-button">
+                {buttonText}
+            </OptinButton>
+            <p id = "#non-compatible-message">
+                Your browser is not compatible with push notifications
+            </p>
+        </div>
     )
 }
 
-
-const BigButton = styled.button`
+const OptinButton = styled.button`
     color: white;
-    padding: 30px 10px;
     background: #1338a0;
-    margin: 1em auto;
-    font-size: 29px;
     display: block;
     align-items: center;
     text-transform: uppercase;
@@ -61,5 +88,4 @@ const BigButton = styled.button`
     padding: 12.5px 25px;
     line-height: 1;
     margin: 0;
-
 `
