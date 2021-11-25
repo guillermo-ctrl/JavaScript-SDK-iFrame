@@ -1,11 +1,40 @@
 import styled from 'styled-components'
+import {useEffect, useState} from "react";
 
-let Status = "Push notifications off"
+export default function Button(){
 
-export default function TheButton(){
+    const [status, setStatus] = useState("Notifications are off")
+    const [subscribed, setSubscribed] = useState(false)
+    const CleverPush = window.CleverPush || [];
+
+    const handleClick = event => {
+        CleverPush.push(['isSubscribed', function(result) {
+            console.log('CleverPush isSubscribed result', result); // true or false
+            setSubscribed(result)
+          }])
+        console.log(subscribed)
+        if (subscribed) {
+            console.log("1")
+            CleverPush.push(['unsubscribe']);
+            setStatus("Notifications are off")
+        }
+        else {
+            console.log("2")
+            CleverPush.push(['triggerOptIn', true, function(err, subscriptionId) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log('successfully subscribed with id', subscriptionId);
+                    setStatus("Notifications are on")
+                }
+            }]);
+        }
+        
+    }
+
     return(
-        <BigButton>
-            {Status}
+        <BigButton onClick = {handleClick}>
+            {status}
         </BigButton>
     )
 }
