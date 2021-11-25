@@ -5,6 +5,7 @@ export default function Button(){
 
     const [buttonText, setButtonText] = useState("Notifications are off")
     const [subscribed, setSubscribed] = useState(false)
+    const [compatibleBrowser, setCompatibleBrowser] = useState(false);
     const CleverPush = window.CleverPush || [];
     CleverPush.push(['unsubscribe']);
   
