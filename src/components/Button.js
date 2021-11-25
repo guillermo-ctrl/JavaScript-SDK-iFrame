@@ -5,16 +5,44 @@ export default function Button(){
 
     const [buttonText, setButtonText] = useState("Notifications are off")
     const [subscribed, setSubscribed] = useState(false)
+    const [compatibleBrowser, setCompatibleBrowser] = useState(false);
     const CleverPush = window.CleverPush || [];
     CleverPush.push(['unsubscribe']);
   
     
+<<<<<<< HEAD
     useEffect(() => {
         const button = document.getElementById('#cleverpush-button')
         const text = document.getElementById('#non-compatible-message')
         
         button.style.display = 'none';
         text.style.display = 'none';
+||||||| 24b3022
+=======
+    useEffect(() => {
+        console.log("useeffect")
+        document.getElementById('#cleverpush-button').style.display = 'none';
+    
+        var showPushOptIn = function() {
+            document.getElementById('#cleverpush-button').style.display = 'block';
+        }
+        
+        if (!window.CleverPush || !window.CleverPush.initialized) {
+            window.cleverPushInitCallback = function(err) {
+                if (err) {
+                    console.error('Init callback error:', err);
+                } else {
+                    showPushOptIn();
+                    setCompatibleBrowser(true)
+                }
+            };
+        } else {
+            showPushOptIn();
+            setCompatibleBrowser(true)
+        }
+      });
+
+>>>>>>> cfef3e603980b988bc453395c0ef1daa65ba4eec
 
         var showPushOptIn = function() {
             button.style.display = 'block';
@@ -64,6 +92,7 @@ export default function Button(){
         }
     }
 
+<<<<<<< HEAD
     return(
         <div>
             <OptinButton onClick = {handleClick} id = "#cleverpush-button">
@@ -74,6 +103,34 @@ export default function Button(){
             </p>
         </div>
     )
+||||||| 24b3022
+    return(
+        <BigButton onClick = {handleClick}>
+            {status}
+        </BigButton>
+    )
+=======
+    if (compatibleBrowser) {
+        return(
+            <BigButton onClick = {handleClick} id = "#cleverpush-button">
+                {status}
+            </BigButton>
+        )
+    }
+    else {
+        return (
+            <div>
+                <p id = "#cleverpush-button"></p>
+
+                <p>
+                Your browser is not compatible with push notifications
+            </p>
+            </div>
+            
+        )
+    }
+    
+>>>>>>> cfef3e603980b988bc453395c0ef1daa65ba4eec
 }
 
 const OptinButton = styled.button`
