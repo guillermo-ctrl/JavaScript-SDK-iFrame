@@ -4,34 +4,36 @@ import {useEffect, useState} from "react";
 export default function Button(){
 
     const [status, setStatus] = useState("Notifications are off")
-    const [subscribed, setSubscribed] = useState(Boolean)
+    const [subscribed, setSubscribed] = useState(false)
     const CleverPush = window.CleverPush || [];
-
-    CleverPush.push(['isSubscribed', function(result) {
-        console.log('CleverPush isSubscribed result', result); 
-        setSubscribed(result)
-      }])
+    CleverPush.push(['unsubscribe']);
+  
+    
 
     const handleClick = event => {
-        
-        console.log(subscribed)
+
+        CleverPush.push(['isSubscribed', function(result) {
+            console.log('CleverPush isSubscribed result', result); 
+            setSubscribed(result)
+          }])
 
         if (subscribed) {
-            console.log("1")
             CleverPush.push(['unsubscribe']);
             setStatus("Notifications are off")
             setSubscribed(false)
         }
         else {
-            console.log("2")
             CleverPush.push(['triggerOptIn', true, function(err, subscriptionId) {
                 if (err) {
                     console.error(err);
+                    alert("There was an error, please try again");
                 } else {
                     console.log('successfully subscribed with id', subscriptionId);
+                    setSubscribed(true)
                     setStatus("Notifications are on")
                 }
             }]);
+            
         }
         
     }
